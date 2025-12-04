@@ -1,0 +1,123 @@
+{% extends "nsp/base.html" %}
+{% load static %}
+
+{% block title %}Login | Dashboard NSP{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        background: linear-gradient(135deg, rgba(11, 31, 58, 0.65) 0%, rgba(13, 45, 83, 0.62) 45%, rgba(18, 59, 112, 0.58) 100%), url("{% static 'img/login_bg.png' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-blend-mode: overlay;
+        min-height: 100vh;
+    }
+    .login-header-bar {
+        width: 100%;
+        padding: 14px 24px;
+        background: linear-gradient(90deg, #081529, #0b2140, #0f3058);
+        color: #f0f5ff;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+    .login-screen {
+        min-height: 100vh;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .login-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.24);
+        overflow: hidden;
+        background: rgba(255,255,255,0.98);
+    }
+    .login-card .card-body { padding: 32px; }
+    .login-badge {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(14, 122, 240, 0.14);
+        color: #0c63ce;
+        font-size: 1.6rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-header-bar">Nucleo de Seguranca do Paciente</div>
+<div class="login-screen">
+  <div class="container" style="max-width: 460px;">
+    <div class="card login-card bg-white">
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <div class="login-badge mb-3">
+            <i class="bi bi-heart-pulse-fill"></i>
+          </div>
+          <h3 class="fw-bold text-dark mb-1">Portal NSP</h3>
+          <p class="text-muted small mb-0">Nucleo de Seguranca do Paciente</p>
+        </div>
+
+        {% if form.errors %}
+          <div class="alert alert-danger py-2">Usuario ou senha invalidos.</div>
+        {% endif %}
+        {% if next and user.is_authenticated %}
+          <div class="alert alert-warning py-2">Sua conta nao tem acesso a essa pagina.</div>
+        {% endif %}
+
+        <form method="post" novalidate id="loginForm">
+          {% csrf_token %}
+          <div class="form-floating mb-3">
+            <input type="text" name="username" class="form-control" id="id_username" placeholder="usuario" required autocomplete="username">
+            <label for="id_username">Usuario ou email</label>
+          </div>
+          <div class="form-floating mb-4">
+            <input type="password" name="password" class="form-control" id="id_password" placeholder="senha" required autocomplete="current-password">
+            <label for="id_password">Senha</label>
+          </div>
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-lg py-3 fw-bold shadow-sm" type="submit" id="btnLogin">
+              <span id="btnText">Acessar sistema</span>
+              <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="text-center mt-3">
+            <a href="#" class="text-decoration-none text-muted small">Esqueceu a senha?</a>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer text-center bg-white border-0 pb-4 pt-0">
+        <small class="text-muted">&copy; 2025 Hospital de Retaguarda de Rondônia v1.0</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("loginForm");
+    const btn = document.getElementById("btnLogin");
+    const text = document.getElementById("btnText");
+    const spin = document.getElementById("btnSpinner");
+
+    form.addEventListener("submit", () => {
+      btn.disabled = true;
+      text.innerText = "Autenticando...";
+      spin.classList.remove("d-none");
+    });
+  });
+</script>
+{% endblock %}
