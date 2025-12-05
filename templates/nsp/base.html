@@ -22,13 +22,23 @@
             </button>
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Apresentacao</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'coleta' %}">Coleta de Dados</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboards</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'coleta' %}">Indicadores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Documentos</a></li>
                 </ul>
+                <form class="d-flex me-3" role="search">
+                    <input class="form-control form-control-sm me-2" type="search" placeholder="Buscar" aria-label="Buscar">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
+                </form>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item d-flex align-items-center me-3">
+                        <span class="text-white-50"><i class="bi bi-bell"></i></span>
+                    </li>
                     {% if request.user.is_authenticated %}
-                        <li class="nav-item"><span class="navbar-text me-3">Ola, {{ request.user.username }}</span></li>
+                        <li class="nav-item d-flex align-items-center me-2 text-white-50">
+                            <i class="bi bi-person-circle me-1"></i> {{ request.user.username }}
+                        </li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Sair</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
