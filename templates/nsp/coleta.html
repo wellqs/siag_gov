@@ -1,0 +1,33 @@
+{% extends "nsp/base.html" %}
+
+{% block title %}Coleta de dados | NSP{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="mb-4">
+    <h3 class="mb-1">Coleta de dados do dashboard</h3>
+    <p class="text-muted mb-0" style="font-size: 0.95rem;">Informe os valores que serao exibidos no dashboard NSP.</p>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="col-md-6">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="text-danger small">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <div class="col-12 d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Salvar e ir ao dashboard</button>
+          <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
