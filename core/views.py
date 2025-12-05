@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from .models import MetricEntry
 
@@ -52,6 +53,25 @@ def home(request):
 
 @login_required
 def dashboard(request):
+    base_labels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+    stats = {
+        "total_ea_nsp": 0,
+        "total_ea_notivisa": 0,
+        "taxa_conformidade": 0,
+        "total_pacientes": 0,
+        "total_pulseiras": 0,
+        "total_ea_queda": 0,
+        "total_ea_flebite": 0,
+    }
+    chart_data = {
+        "chart_labels": base_labels,
+        "chart_ea_nsp": [0] * 12,
+        "chart_ea_notivisa": [0] * 12,
+        "chart_ea_queda": [0] * 12,
+        "chart_ea_flebite": [0] * 12,
+    }
+    ano = timezone.now().year
+
     latest = MetricEntry.objects.order_by("-created_at").first()
     if latest:
         stats = {
@@ -63,7 +83,6 @@ def dashboard(request):
             "total_ea_queda": latest.total_ea_queda,
             "total_ea_flebite": latest.total_ea_flebite,
         }
-        base_labels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
         chart_data = {
             "chart_labels": base_labels,
             "chart_ea_nsp": [latest.total_ea_nsp] * 12,
@@ -72,27 +91,8 @@ def dashboard(request):
             "chart_ea_flebite": [latest.total_ea_flebite] * 12,
         }
         ano = latest.referencia.year
-    else:
-        stats = {
-            "total_ea_nsp": 154,
-            "total_ea_notivisa": 42,
-            "taxa_conformidade": 92.5,
-            "total_pacientes": 1250,
-            "total_pulseiras": 1156,
-            "total_ea_queda": 12,
-            "total_ea_flebite": 5,
-        }
-        chart_data = {
-            "chart_labels": ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
-            "chart_ea_nsp": [10, 12, 15, 8, 20, 15, 10, 14, 18, 12, 10, 10],
-            "chart_ea_notivisa": [2, 3, 5, 2, 6, 4, 2, 5, 4, 3, 3, 3],
-            "chart_ea_queda": [1, 0, 2, 1, 0, 1, 2, 1, 0, 2, 1, 1],
-            "chart_ea_flebite": [0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-        }
-        ano = 2024
 
-    chart_labels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
-    chart_data.setdefault("chart_labels", chart_labels)
+    chart_data.setdefault("chart_labels", base_labels)
 
     context = {
         "titulo": "Dashboard NSP - Seguranca do Paciente",
