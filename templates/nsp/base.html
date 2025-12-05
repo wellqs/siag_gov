@@ -1,54 +1,139 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Dashboard NSP{% endblock %}</title>
+    <title>{% block title %}NSP.GOV{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap (mantido para compatibilidade dos formulários atuais) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-        body { background-color: #f8f9fa; }
-        .card { border-radius: 10px; }
-        .card-header { border-bottom: 1px solid #f0f0f0; font-weight: 600; }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, #0b2140, #0d2d53, #123b70);">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">NSP</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboards</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'coleta' %}">Indicadores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Documentos</a></li>
-                </ul>
-                <form class="d-flex me-3" role="search">
-                    <input class="form-control form-control-sm me-2" type="search" placeholder="Buscar" aria-label="Buscar">
-                    <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
-                </form>
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item d-flex align-items-center me-3">
-                        <span class="text-white-50"><i class="bi bi-bell"></i></span>
-                    </li>
-                    {% if request.user.is_authenticated %}
-                        <li class="nav-item d-flex align-items-center me-2 text-white-50">
-                            <i class="bi bi-person-circle me-1"></i> {{ request.user.username }}
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Sair</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                    {% endif %}
-                </ul>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 w-full bg-white border-b border-slate-200 z-50 shadow-sm">
+        <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" class="md:hidden p-1 rounded-md text-slate-600 hover:bg-slate-100">
+                    <span class="material-icons">menu</span>
+                </button>
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='{% url 'home' %}'">
+                    <div class="w-8 h-8 bg-sky-600 rounded-md flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                        NSP
+                    </div>
+                    <span class="text-slate-900 font-bold tracking-tight text-lg">NSP.GOV</span>
+                </div>
+                <div class="hidden md:flex items-center gap-1 ml-6">
+                    <a href="{% url 'home' %}" class="px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:text-sky-700 hover:bg-slate-50 transition-colors">Home</a>
+                    <a href="{% url 'dashboard' %}" class="px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:text-sky-700 hover:bg-slate-50 transition-colors">Dashboards</a>
+                    <a href="{% url 'coleta' %}" class="px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:text-sky-700 hover:bg-slate-50 transition-colors">Indicadores</a>
+                    <a href="#" class="px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:text-sky-700 hover:bg-slate-50 transition-colors">Documentos</a>
+                </div>
+            </div>
+
+            <div class="hidden md:block w-80">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <span class="material-icons" style="font-size: 18px;">search</span>
+                    </span>
+                    <input type="text" placeholder="Pesquisar..." class="w-full rounded-lg border border-slate-300 pl-10 pr-4 py-1.5 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-shadow">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 md:gap-4">
+                <button class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-full">
+                    <span class="material-icons" style="font-size: 20px;">search</span>
+                </button>
+
+                <button class="relative p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+                    <span class="material-icons" style="font-size: 22px;">notifications_none</span>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                </button>
+
+                <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
+
+                <div class="relative group">
+                    <button class="flex items-center gap-2 p-1 pr-2 rounded-full hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all">
+                        <div class="w-8 h-8 rounded-full shadow-sm bg-sky-600 text-white flex items-center justify-center font-semibold">
+                            {{ request.user.username|default:'U'|slice:":2"|upper }}
+                        </div>
+                        <div class="hidden md:flex flex-col items-start">
+                            <span class="text-sm font-medium text-slate-700 leading-tight">{{ request.user.username|default:'Usuario' }}</span>
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Gestor</span>
+                        </div>
+                        <span class="material-icons text-slate-400 hidden md:block" style="font-size: 16px;">expand_more</span>
+                    </button>
+
+                    <div class="hidden group-hover:block absolute right-0 mt-2 bg-white shadow-xl rounded-lg border border-slate-100 w-48 py-1 z-50">
+                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-sky-700">
+                            <span class="material-icons text-slate-400" style="font-size: 18px;">person</span> Perfil
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-sky-700">
+                            <span class="material-icons text-slate-400" style="font-size: 18px;">settings</span> Configuracoes
+                        </a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                            <span class="material-icons" style="font-size: 18px;">logout</span> Sair
+                        </a>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-sky-700">
+                            <span class="material-icons" style="font-size: 18px;">login</span> Login
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white">
+            <div class="px-4 py-3 space-y-1">
+                <a href="{% url 'home' %}" class="block px-3 py-2 text-base font-medium text-slate-600 rounded-md hover:bg-slate-100 hover:text-sky-700">Home</a>
+                <a href="{% url 'dashboard' %}" class="block px-3 py-2 text-base font-medium text-slate-600 rounded-md hover:bg-slate-100 hover:text-sky-700">Dashboards</a>
+                <a href="{% url 'coleta' %}" class="block px-3 py-2 text-base font-medium text-slate-600 rounded-md hover:bg-slate-100 hover:text-sky-700">Indicadores</a>
+                <a href="#" class="block px-3 py-2 text-base font-medium text-slate-600 rounded-md hover:bg-slate-100 hover:text-sky-700">Documentos</a>
+            </div>
+            <div class="px-4 py-3 border-t border-slate-200 bg-slate-50">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <span class="material-icons" style="font-size: 18px;">search</span>
+                    </span>
+                    <input type="text" placeholder="Pesquisar..." class="w-full rounded-md border border-slate-300 pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
             </div>
         </div>
     </nav>
-    {% block content %}{% endblock %}
 
+    <main class="pt-20 pb-10 px-4 max-w-7xl mx-auto">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        if (btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block extra_js %}{% endblock %}
