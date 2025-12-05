@@ -124,13 +124,11 @@
 
     {% if request.path|default:"" != "/login/" %}
     <main class="pt-20 pb-10 px-4 max-w-7xl mx-auto">
-        {% block content %}{% endblock %}
-    </main>
     {% else %}
     <main>
+    {% endif %}
         {% block content %}{% endblock %}
     </main>
-    {% endif %}
 
     <script>
         const btn = document.getElementById('mobile-menu-btn');
