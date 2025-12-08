@@ -6,12 +6,7 @@
 {% block extra_head %}
 <style>
     body {
-        background: linear-gradient(135deg, rgba(11, 31, 58, 0.65) 0%, rgba(13, 45, 83, 0.62) 45%, rgba(18, 59, 112, 0.58) 100%), url("{% static 'img/login_bg.png' %}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-blend-mode: overlay;
+        background: url("{% static 'img/login_bg.png' %}") center center / cover no-repeat fixed;
         min-height: 100vh;
     }
     .login-header-bar {
@@ -55,7 +50,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="login-header-bar">Nucleo de Seguranca do Paciente</div>
+<div class="login-header-bar">Núcleo de Segurança do Paciente</div>
 <div class="login-screen">
   <div class="container" style="max-width: 460px;">
     <div class="card login-card bg-white">
@@ -65,21 +60,21 @@
             <i class="bi bi-heart-pulse-fill"></i>
           </div>
           <h3 class="fw-bold text-dark mb-1">Portal NSP</h3>
-          <p class="text-muted small mb-0">Nucleo de Seguranca do Paciente</p>
+          <p class="text-muted small mb-0">Núcleo de Segurança do Paciente</p>
         </div>
 
         {% if form.errors %}
-          <div class="alert alert-danger py-2">Usuario ou senha invalidos.</div>
+          <div class="alert alert-danger py-2">Usuário ou senha inválidos.</div>
         {% endif %}
         {% if next and user.is_authenticated %}
-          <div class="alert alert-warning py-2">Sua conta nao tem acesso a essa pagina.</div>
+          <div class="alert alert-warning py-2">Sua conta não tem acesso a essa página.</div>
         {% endif %}
 
         <form method="post" novalidate id="loginForm">
           {% csrf_token %}
           <div class="form-floating mb-3">
-            <input type="text" name="username" class="form-control" id="id_username" placeholder="usuario" required autocomplete="username">
-            <label for="id_username">Usuario ou email</label>
+            <input type="text" name="username" class="form-control" id="id_username" placeholder="usuário" required autocomplete="username">
+            <label for="id_username">Usuário ou e-mail</label>
           </div>
           <div class="form-floating mb-4">
             <input type="password" name="password" class="form-control" id="id_password" placeholder="senha" required autocomplete="current-password">

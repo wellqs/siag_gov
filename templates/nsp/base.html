@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}NSP.GOV{% endblock %}</title>
+    <title>{% block title %}NSP.HRRO{% endblock %}</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -39,7 +39,7 @@
                     <div class="w-8 h-8 bg-sky-600 rounded-md flex items-center justify-center text-white font-bold text-xs shadow-sm">
                         NSP
                     </div>
-                    <span class="text-slate-900 font-bold tracking-tight text-lg">NSP.GOV</span>
+                    <span class="text-slate-900 font-bold tracking-tight text-lg">NSP.HRRO</span>
                 </div>
                 <div class="hidden md:flex items-center gap-1 ml-6">
                     <a href="{% url 'home' %}" class="px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:text-sky-700 hover:bg-slate-50 transition-colors">Home</a>
@@ -76,7 +76,7 @@
                             {{ request.user.username|default:'U'|slice:":2"|upper }}
                         </div>
                         <div class="hidden md:flex flex-col items-start">
-                            <span class="text-sm font-medium text-slate-700 leading-tight">{{ request.user.username|default:'Usuario' }}</span>
+                            <span class="text-sm font-medium text-slate-700 leading-tight">{{ request.user.username|default:'Usuário' }}</span>
                             <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Gestor</span>
                         </div>
                         <span class="material-icons text-slate-400 hidden md:block" style="font-size: 16px;">expand_more</span>
@@ -87,7 +87,7 @@
                             <span class="material-icons text-slate-400" style="font-size: 18px;">person</span> Perfil
                         </a>
                         <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-sky-700">
-                            <span class="material-icons text-slate-400" style="font-size: 18px;">settings</span> Configuracoes
+                            <span class="material-icons text-slate-400" style="font-size: 18px;">settings</span> Configurações
                         </a>
                         <div class="border-t border-slate-100 my-1"></div>
                         {% if request.user.is_authenticated %}
@@ -125,13 +125,11 @@
 
     {% if request.path|default:"" != "/login/" %}
     <main class="pt-20 pb-10 px-4 max-w-7xl mx-auto">
-        {% block content %}{% endblock %}
-    </main>
     {% else %}
     <main>
+    {% endif %}
         {% block content %}{% endblock %}
     </main>
-    {% endif %}
 
     <script>
         const btn = document.getElementById('mobile-menu-btn');

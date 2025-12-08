@@ -6,13 +6,20 @@
 <div class="container-fluid py-4">
 
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-    <h2 class="mb-3 mb-md-0 text-primary fw-bold">Dashboard NSP - Seguranca do Paciente</h2>
+    <h2 class="mb-3 mb-md-0 text-primary fw-bold">Dashboard NSP - Segurança do Paciente</h2>
 
-    <form class="row g-2" id="filterForm">
+    <form class="row g-2" id="filterForm" method="get">
       <div class="col-auto">
-        <select id="anoSelect" class="form-select form-select-sm shadow-sm">
+        <select id="anoSelect" name="ano" class="form-select form-select-sm shadow-sm">
           {% for ano in anos %}
             <option value="{{ ano }}" {% if ano == ano_selecionado %}selected{% endif %}>{{ ano }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <select id="mesSelect" class="form-select form-select-sm shadow-sm" name="mes">
+          {% for num, nome in meses %}
+            <option value="{{ num }}" {% if num == mes_selecionado %}selected{% endif %}>{{ nome }}</option>
           {% endfor %}
         </select>
       </div>
@@ -35,55 +42,55 @@
   <div class="row g-3 mb-4">
     <div class="col-md-4 col-xl-2">
       <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="text-muted mb-1" style="font-size: 0.85rem;">EA notificados ao NSP</h6>
-          <h3 class="mb-0 fw-bold text-dark" id="val-total-ea-nsp">0</h3>
+        <div class="card-body d-flex flex-column">
+          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos Adversos notificados ao NSP</div>
+          <div class="fs-2 fw-bold text-dark text-center flex-fill d-flex align-items-center justify-content-center" id="val-total-ea-nsp">{{ stats.total_ea_nsp }}</div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
       <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="text-muted mb-1" style="font-size: 0.85rem;">EA enviados ao NOTIVISA</h6>
-          <h3 class="mb-0 fw-bold text-dark" id="val-total-ea-notivisa">0</h3>
-          <small class="text-muted" style="font-size: 0.75rem;">
-            <span id="val-ratio">0</span> / <span id="val-ratio-total">0</span> enviadas
-          </small>
+        <div class="card-body d-flex flex-column">
+          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos Adversos enviados ao NOTIVISA</div>
+          <div class="fs-2 fw-bold text-dark text-center flex-fill d-flex align-items-center justify-content-center" id="val-total-ea-notivisa">{{ stats.total_ea_notivisa }}</div>
+          <div class="text-center text-muted" style="font-size: 0.75rem;">
+            <span id="val-ratio">{{ stats.total_ea_notivisa }}</span> / <span id="val-ratio-total">{{ stats.total_ea_nsp }}</span> enviadas
+          </div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
       <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="text-muted mb-1" style="font-size: 0.85rem;">Taxa de conformidade ID</h6>
-          <h3 class="mb-0 fw-bold text-success" id="val-taxa-conformidade">0%</h3>
+        <div class="card-body d-flex flex-column">
+          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Taxa de conformidade ID</div>
+          <div class="fs-2 fw-bold text-success text-center flex-fill d-flex align-items-center justify-content-center" id="val-taxa-conformidade">{{ stats.taxa_conformidade }}%</div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
       <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="text-muted mb-1" style="font-size: 0.85rem;">Pacientes avaliados</h6>
-          <h3 class="mb-0 fw-bold text-dark" id="val-total-pacientes">0</h3>
-          <small class="text-muted" style="font-size: 0.75rem;">
-            <span id="val-pulseiras">0</span> com pulseira correta
-          </small>
+        <div class="card-body d-flex flex-column">
+          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Pacientes avaliados</div>
+          <div class="fs-2 fw-bold text-dark text-center flex-fill d-flex align-items-center justify-content-center" id="val-total-pacientes">{{ stats.total_pacientes }}</div>
+          <div class="text-center text-muted" style="font-size: 0.75rem;">
+            <span id="val-pulseiras">{{ stats.total_pulseiras }}</span> com pulseira correta
+          </div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
       <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="text-muted mb-1" style="font-size: 0.85rem;">Eventos de queda</h6>
-          <h3 class="mb-0 fw-bold text-danger" id="val-ea-queda">0</h3>
+        <div class="card-body d-flex flex-column">
+          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos de queda</div>
+          <div class="fs-2 fw-bold text-danger text-center flex-fill d-flex align-items-center justify-content-center" id="val-ea-queda">{{ stats.total_ea_queda }}</div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
       <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="text-muted mb-1" style="font-size: 0.85rem;">Eventos por flebite</h6>
-          <h3 class="mb-0 fw-bold text-warning" id="val-ea-flebite">0</h3>
+        <div class="card-body d-flex flex-column">
+          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos por flebite</div>
+          <div class="fs-2 fw-bold text-warning text-center flex-fill d-flex align-items-center justify-content-center" id="val-ea-flebite">{{ stats.total_ea_flebite }}</div>
         </div>
       </div>
     </div>
@@ -93,7 +100,7 @@
     <div class="col-lg-8">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <span>Evolucao dos eventos adversos (<span id="label-ano">{{ ano_selecionado }}</span>)</span>
+          <span>Evolução dos eventos adversos ({{ ano_selecionado }})</span>
         </div>
         <div class="card-body">
           <canvas id="lineEventos"></canvas>
@@ -104,7 +111,7 @@
     <div class="col-lg-4">
       <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white">
-          <strong>Conformidade de identificacao</strong>
+          <strong>Conformidade de identificação</strong>
         </div>
         <div class="card-body" style="height: 250px; display: flex; justify-content: center;">
           <canvas id="doughnutIdentificacao"></canvas>
@@ -113,7 +120,7 @@
 
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-white">
-          <strong>Distribuicao de tipos de eventos</strong>
+          <strong>Distribuição de tipos de eventos</strong>
         </div>
         <div class="card-body">
           <canvas id="barDistribuicao"></canvas>
@@ -131,34 +138,20 @@
 
 {% block extra_js %}
 <script>
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    function generateMonthlyData(min, max) {
-        return Array.from({length: 12}, () => getRandomInt(min, max));
-    }
-
     const stats = JSON.parse(document.getElementById("stats-data").textContent);
     const chartData = JSON.parse(document.getElementById("chart-data").textContent);
 
-    let currentData = {
-        ...stats,
-        ...chartData
-    };
-
-    let lineChart, doughnutChart, barChart;
-
-    function initCharts() {
+    document.addEventListener("DOMContentLoaded", () => {
         const ctxLine = document.getElementById("lineEventos").getContext("2d");
-        lineChart = new Chart(ctxLine, {
+        new Chart(ctxLine, {
             type: "line",
             data: {
-                labels: currentData.chart_labels,
+                labels: chartData.chart_labels,
                 datasets: [
-                    { label: "EA NSP", data: currentData.chart_ea_nsp, tension: 0.3, borderColor: "#0d6efd", backgroundColor: "rgba(13, 110, 253, 0.1)", fill: true },
-                    { label: "EA NOTIVISA", data: currentData.chart_ea_notivisa, tension: 0.3, borderColor: "#6c757d", borderDash: [5, 5] },
-                    { label: "Quedas", data: currentData.chart_ea_queda, tension: 0.3, borderColor: "#dc3545" },
-                    { label: "Flebite", data: currentData.chart_ea_flebite, tension: 0.3, borderColor: "#ffc107" },
+                    { label: "Eventos Adversos (NSP)", data: chartData.chart_ea_nsp, tension: 0.3, borderColor: "#0d6efd", backgroundColor: "rgba(13, 110, 253, 0.1)", fill: true },
+                    { label: "Eventos Adversos (NOTIVISA)", data: chartData.chart_ea_notivisa, tension: 0.3, borderColor: "#6c757d", borderDash: [5, 5] },
+                    { label: "Quedas", data: chartData.chart_ea_queda, tension: 0.3, borderColor: "#dc3545" },
+                    { label: "Flebite", data: chartData.chart_ea_flebite, tension: 0.3, borderColor: "#ffc107" },
                 ]
             },
             options: {
@@ -170,14 +163,14 @@
         });
 
         const ctxDoughnut = document.getElementById("doughnutIdentificacao").getContext("2d");
-        doughnutChart = new Chart(ctxDoughnut, {
+        new Chart(ctxDoughnut, {
             type: "doughnut",
             data: {
                 labels: ["Correta", "Incorreta/sem pulseira"],
                 datasets: [{
                     data: [
-                        currentData.total_pulseiras,
-                        currentData.total_pacientes - currentData.total_pulseiras
+                        stats.total_pulseiras,
+                        stats.total_pacientes - stats.total_pulseiras
                     ],
                     backgroundColor: ["#198754", "#dc3545"]
                 }]
@@ -190,16 +183,16 @@
         });
 
         const ctxBar = document.getElementById("barDistribuicao").getContext("2d");
-        barChart = new Chart(ctxBar, {
+        new Chart(ctxBar, {
             type: "bar",
             data: {
-                labels: ["EA NSP", "EA NOTIVISA", "Queda", "Flebite"],
+                labels: ["Eventos Adversos (NSP)", "Eventos Adversos (NOTIVISA)", "Queda", "Flebite"],
                 datasets: [{
                     data: [
-                        currentData.total_ea_nsp,
-                        currentData.total_ea_notivisa,
-                        currentData.total_ea_queda,
-                        currentData.total_ea_flebite
+                        stats.total_ea_nsp,
+                        stats.total_ea_notivisa,
+                        stats.total_ea_queda,
+                        stats.total_ea_flebite
                     ],
                     backgroundColor: ["#0d6efd", "#6c757d", "#dc3545", "#ffc107"]
                 }]
@@ -209,77 +202,6 @@
                 responsive: true,
                 plugins: { legend: { display: false } }
             }
-        });
-    }
-
-    function updateDashboardUI() {
-        document.getElementById("val-total-ea-nsp").innerText = currentData.total_ea_nsp;
-        document.getElementById("val-total-ea-notivisa").innerText = currentData.total_ea_notivisa;
-        document.getElementById("val-ratio").innerText = currentData.total_ea_notivisa.toFixed(1);
-        document.getElementById("val-ratio-total").innerText = currentData.total_ea_nsp;
-        document.getElementById("val-taxa-conformidade").innerText = currentData.taxa_conformidade + "%";
-        document.getElementById("val-total-pacientes").innerText = currentData.total_pacientes;
-        document.getElementById("val-pulseiras").innerText = currentData.total_pulseiras;
-        document.getElementById("val-ea-queda").innerText = currentData.total_ea_queda;
-        document.getElementById("val-ea-flebite").innerText = currentData.total_ea_flebite;
-
-        lineChart.data.datasets[0].data = currentData.chart_ea_nsp;
-        lineChart.data.datasets[1].data = currentData.chart_ea_notivisa;
-        lineChart.data.datasets[2].data = currentData.chart_ea_queda;
-        lineChart.data.datasets[3].data = currentData.chart_ea_flebite;
-        lineChart.update();
-
-        doughnutChart.data.datasets[0].data = [
-            currentData.total_pulseiras,
-            currentData.total_pacientes - currentData.total_pulseiras
-        ];
-        doughnutChart.update();
-
-        barChart.data.datasets[0].data = [
-            currentData.total_ea_nsp,
-            currentData.total_ea_notivisa,
-            currentData.total_ea_queda,
-            currentData.total_ea_flebite
-        ];
-        barChart.update();
-    }
-
-    function simulateNewData() {
-        currentData.total_ea_nsp = getRandomInt(100, 300);
-        currentData.total_ea_notivisa = Math.floor(currentData.total_ea_nsp * 0.3);
-        currentData.taxa_conformidade = getRandomInt(70, 99);
-        currentData.total_pacientes = getRandomInt(800, 1500);
-        currentData.total_pulseiras = Math.floor(currentData.total_pacientes * (currentData.taxa_conformidade / 100));
-        currentData.total_ea_queda = getRandomInt(5, 30);
-        currentData.total_ea_flebite = getRandomInt(2, 15);
-
-        currentData.chart_ea_nsp = generateMonthlyData(5, 30);
-        currentData.chart_ea_notivisa = currentData.chart_ea_nsp.map(v => Math.floor(v * 0.3));
-        currentData.chart_ea_queda = generateMonthlyData(0, 5);
-        currentData.chart_ea_flebite = generateMonthlyData(0, 3);
-
-        const year = document.getElementById("anoSelect").value;
-        document.getElementById("label-ano").innerText = year;
-
-        updateDashboardUI();
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        initCharts();
-        updateDashboardUI();
-
-        document.getElementById("filterForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector("button");
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "Filtrando...";
-            btn.disabled = true;
-
-            setTimeout(() => {
-                simulateNewData();
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, 600);
         });
     });
 </script>

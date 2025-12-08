@@ -1,5 +1,8 @@
 from django import forms
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from django.db.models.functions import ExtractMonth
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
@@ -54,6 +57,13 @@ def home(request):
 @login_required
 def dashboard(request):
     base_labels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+    chart_data = {
+        "chart_labels": base_labels,
+        "chart_ea_nsp": [0] * 12,
+        "chart_ea_notivisa": [0] * 12,
+        "chart_ea_queda": [0] * 12,
+        "chart_ea_flebite": [0] * 12,
+    }
     stats = {
         "total_ea_nsp": 0,
         "total_ea_notivisa": 0,
@@ -63,43 +73,92 @@ def dashboard(request):
         "total_ea_queda": 0,
         "total_ea_flebite": 0,
     }
-    chart_data = {
-        "chart_labels": base_labels,
-        "chart_ea_nsp": [0] * 12,
-        "chart_ea_notivisa": [0] * 12,
-        "chart_ea_queda": [0] * 12,
-        "chart_ea_flebite": [0] * 12,
-    }
-    ano = timezone.now().year
 
-    latest = MetricEntry.objects.order_by("-created_at").first()
-    if latest:
+    latest_ref = MetricEntry.objects.order_by("-referencia").first()
+    ano_selecionado = int(
+        request.GET.get("ano")
+        or (latest_ref.referencia.year if latest_ref else timezone.now().year)
+    )
+    mes_param = request.GET.get("mes")
+    try:
+        mes_selecionado = int(mes_param) if mes_param else (latest_ref.referencia.month if latest_ref else 1)
+    except (TypeError, ValueError):
+        mes_selecionado = 1
+
+    qs_year = MetricEntry.objects.filter(referencia__year=ano_selecionado)
+    monthly = (
+        qs_year.annotate(month=ExtractMonth("referencia"))
+        .values("month")
+        .annotate(
+            ea_nsp=Sum("total_ea_nsp"),
+            ea_notivisa=Sum("total_ea_notivisa"),
+            queda=Sum("total_ea_queda"),
+            flebite=Sum("total_ea_flebite"),
+            pulseiras=Sum("total_pulseiras"),
+            pacientes=Sum("total_pacientes"),
+        )
+        .order_by("month")
+    )
+
+    monthly_map = {row["month"]: row for row in monthly}
+    for row in monthly:
+        idx = row["month"] - 1
+        chart_data["chart_ea_nsp"][idx] = row["ea_nsp"] or 0
+        chart_data["chart_ea_notivisa"][idx] = row["ea_notivisa"] or 0
+        chart_data["chart_ea_queda"][idx] = row["queda"] or 0
+        chart_data["chart_ea_flebite"][idx] = row["flebite"] or 0
+
+    if mes_param:
+        # Zera meses fora do filtro para refletir apenas o mes escolhido no grafico
+        filtered = {"chart_ea_nsp": [0] * 12, "chart_ea_notivisa": [0] * 12, "chart_ea_queda": [0] * 12, "chart_ea_flebite": [0] * 12}
+        row = monthly_map.get(mes_selecionado)
+        if row:
+            idx = mes_selecionado - 1
+            filtered["chart_ea_nsp"][idx] = row["ea_nsp"] or 0
+            filtered["chart_ea_notivisa"][idx] = row["ea_notivisa"] or 0
+            filtered["chart_ea_queda"][idx] = row["queda"] or 0
+            filtered["chart_ea_flebite"][idx] = row["flebite"] or 0
+        chart_data.update(filtered)
+
+    # Cards: usa agregacao do mes selecionado (ou zero se nao existir)
+    if qs_year.exists():
+        month_agg = qs_year.filter(referencia__month=mes_selecionado).aggregate(
+            ea_nsp=Sum("total_ea_nsp"),
+            ea_notivisa=Sum("total_ea_notivisa"),
+            queda=Sum("total_ea_queda"),
+            flebite=Sum("total_ea_flebite"),
+            pulseiras=Sum("total_pulseiras"),
+            pacientes=Sum("total_pacientes"),
+        )
+        total_pacientes = month_agg["pacientes"] or 0
+        total_pulseiras = month_agg["pulseiras"] or 0
+        taxa_conf = 0
+        if total_pacientes:
+            taxa_conf = float((total_pulseiras / total_pacientes) * 100)
         stats = {
-            "total_ea_nsp": latest.total_ea_nsp,
-            "total_ea_notivisa": latest.total_ea_notivisa,
-            "taxa_conformidade": float(latest.taxa_conformidade),
-            "total_pacientes": latest.total_pacientes,
-            "total_pulseiras": latest.total_pulseiras,
-            "total_ea_queda": latest.total_ea_queda,
-            "total_ea_flebite": latest.total_ea_flebite,
+            "total_ea_nsp": month_agg["ea_nsp"] or 0,
+            "total_ea_notivisa": month_agg["ea_notivisa"] or 0,
+            "taxa_conformidade": round(taxa_conf, 2),
+            "total_pacientes": total_pacientes,
+            "total_pulseiras": total_pulseiras,
+            "total_ea_queda": month_agg["queda"] or 0,
+            "total_ea_flebite": month_agg["flebite"] or 0,
         }
-        chart_data = {
-            "chart_labels": base_labels,
-            "chart_ea_nsp": [latest.total_ea_nsp] * 12,
-            "chart_ea_notivisa": [latest.total_ea_notivisa] * 12,
-            "chart_ea_queda": [latest.total_ea_queda] * 12,
-            "chart_ea_flebite": [latest.total_ea_flebite] * 12,
-        }
-        ano = latest.referencia.year
 
-    chart_data.setdefault("chart_labels", base_labels)
+    anos_disponiveis = set(MetricEntry.objects.values_list("referencia__year", flat=True))
+    anos_disponiveis.update({2023, 2024, 2025, ano_selecionado})
 
     context = {
         "titulo": "Dashboard NSP - Seguranca do Paciente",
         "stats": stats,
         "chart_data": chart_data,
-        "anos": [2023, 2024, 2025],
-        "ano_selecionado": ano,
+        "anos": sorted(anos_disponiveis),
+        "ano_selecionado": ano_selecionado,
+        "meses": [
+            (1, "Jan"), (2, "Fev"), (3, "Mar"), (4, "Abr"), (5, "Mai"), (6, "Jun"),
+            (7, "Jul"), (8, "Ago"), (9, "Set"), (10, "Out"), (11, "Nov"), (12, "Dez")
+        ],
+        "mes_selecionado": mes_selecionado,
         "setores": ["UTI Adulto", "Emergencia", "Centro Cirurgico", "Clinica Medica"],
     }
     return render(request, "nsp/dashboard.html", context)
@@ -115,3 +174,19 @@ def coleta(request):
     else:
         form = MetricEntryForm()
     return render(request, "nsp/coleta.html", {"form": form})
+
+
+def logout_view(request):
+    """Encerrar sessao e redirecionar para a tela de login."""
+    logout(request)
+    return redirect("login")
+
+
+@login_required
+def equipe(request):
+    """Pagina estatica para listar equipe do NSP/gestao."""
+    members = [
+        {"nome": "LEIDIANE DA SILVA SANTANA", "cargo": "Cordenadora NSP", "email": "nsphc.ro@gmail.com"},
+        {"nome": "NARJARA LOPES DA SILVA", "cargo": "Auxiliar Tecnica", "email": "nsphc.ro@gmail.com"},
+    ]
+    return render(request, "nsp/equipe.html", {"members": members})
