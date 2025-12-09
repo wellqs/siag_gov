@@ -3,7 +3,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from .models import MetricEntry
@@ -79,11 +79,12 @@ def dashboard(request):
         request.GET.get("ano")
         or (latest_ref.referencia.year if latest_ref else timezone.now().year)
     )
-    mes_param = request.GET.get("mes")
+    mes_param_raw = (request.GET.get("mes") or "").strip().lower()
+    mostrar_todos_meses = mes_param_raw in ("", "todos", "all")
     try:
-        mes_selecionado = int(mes_param) if mes_param else (latest_ref.referencia.month if latest_ref else 1)
+        mes_selecionado = None if mostrar_todos_meses else int(mes_param_raw)
     except (TypeError, ValueError):
-        mes_selecionado = 1
+        mes_selecionado = None if mostrar_todos_meses else (latest_ref.referencia.month if latest_ref else 1)
 
     qs_year = MetricEntry.objects.filter(referencia__year=ano_selecionado)
     monthly = (
@@ -108,8 +109,8 @@ def dashboard(request):
         chart_data["chart_ea_queda"][idx] = row["queda"] or 0
         chart_data["chart_ea_flebite"][idx] = row["flebite"] or 0
 
-    if mes_param:
-        # Zera meses fora do filtro para refletir apenas o mes escolhido no grafico
+    if mes_selecionado:
+        # Zera meses fora do filtro para refletir apenas o mês escolhido no gráfico
         filtered = {"chart_ea_nsp": [0] * 12, "chart_ea_notivisa": [0] * 12, "chart_ea_queda": [0] * 12, "chart_ea_flebite": [0] * 12}
         row = monthly_map.get(mes_selecionado)
         if row:
@@ -120,9 +121,10 @@ def dashboard(request):
             filtered["chart_ea_flebite"][idx] = row["flebite"] or 0
         chart_data.update(filtered)
 
-    # Cards: usa agregacao do mes selecionado (ou zero se nao existir)
+    # Cards: usa agregacao do mes selecionado ou do ano inteiro se "todos"
     if qs_year.exists():
-        month_agg = qs_year.filter(referencia__month=mes_selecionado).aggregate(
+        qs_cards = qs_year if mes_selecionado is None else qs_year.filter(referencia__month=mes_selecionado)
+        month_agg = qs_cards.aggregate(
             ea_nsp=Sum("total_ea_nsp"),
             ea_notivisa=Sum("total_ea_notivisa"),
             queda=Sum("total_ea_queda"),
@@ -155,6 +157,7 @@ def dashboard(request):
         "anos": sorted(anos_disponiveis),
         "ano_selecionado": ano_selecionado,
         "meses": [
+            ("", "Todos"),
             (1, "Jan"), (2, "Fev"), (3, "Mar"), (4, "Abr"), (5, "Mai"), (6, "Jun"),
             (7, "Jul"), (8, "Ago"), (9, "Set"), (10, "Out"), (11, "Nov"), (12, "Dez")
         ],
@@ -165,15 +168,18 @@ def dashboard(request):
 
 
 @login_required
-def coleta(request):
+def coleta(request, pk=None):
+    instance = None
+    if pk:
+        instance = get_object_or_404(MetricEntry, pk=pk)
     if request.method == "POST":
-        form = MetricEntryForm(request.POST)
+        form = MetricEntryForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
-            return redirect("dashboard")
+            return redirect("indicadores")
     else:
-        form = MetricEntryForm()
-    return render(request, "nsp/coleta.html", {"form": form})
+        form = MetricEntryForm(instance=instance)
+    return render(request, "nsp/coleta.html", {"form": form, "instance": instance})
 
 
 def logout_view(request):
@@ -190,3 +196,24 @@ def equipe(request):
         {"nome": "NARJARA LOPES DA SILVA", "cargo": "Auxiliar Tecnica", "email": "nsphc.ro@gmail.com"},
     ]
     return render(request, "nsp/equipe.html", {"members": members})
+
+
+@login_required
+def indicadores(request):
+    registros = MetricEntry.objects.order_by("-referencia", "-created_at")
+    return render(request, "nsp/indicadores.html", {"registros": registros})
+
+
+@login_required
+def indicador_detail(request, pk):
+    registro = get_object_or_404(MetricEntry, pk=pk)
+    return render(request, "nsp/indicador_detail.html", {"registro": registro})
+
+
+@login_required
+def indicador_excluir(request, pk):
+    registro = get_object_or_404(MetricEntry, pk=pk)
+    if request.method == "POST":
+        registro.delete()
+        return redirect("indicadores")
+    return render(request, "nsp/indicador_detail.html", {"registro": registro})

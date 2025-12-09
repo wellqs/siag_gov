@@ -4,30 +4,77 @@
 
 {% block content %}
 <div class="container py-4">
-  <div class="mb-4">
-    <h3 class="mb-1">Indicadores</h3>
-    <p class="text-muted mb-0" style="font-size: 0.95rem;">Informe os valores que serão exibidos no dashboard NSP.</p>
-  </div>
-
-  <div class="card shadow-sm border-0">
-    <div class="card-body p-4">
-      <form method="post" class="row g-3">
-        {% csrf_token %}
-        {% for field in form %}
-          <div class="col-md-6">
-            <label class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-              <div class="text-danger small">{{ field.errors|striptags }}</div>
-            {% endif %}
-          </div>
-        {% endfor %}
-        <div class="col-12 d-flex gap-2">
-          <button type="submit" class="btn btn-primary">Salvar e ir ao dashboard</button>
-          <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancelar</a>
+  <div class="card border-0 shadow-sm" style="border-radius: 16px; background: #f8fafc;">
+    <div class="card-body p-4 p-md-5">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-3" style="background: #e0f2fe; width: 68px; height: 68px;">
+          <i class="bi bi-clipboard-check" style="font-size: 1.8rem; color: #0ea5e9;"></i>
         </div>
-      </form>
+        <h3 class="mt-3 mb-1 fw-bold text-slate-800">Coleta de Indicadores</h3>
+        <p class="text-muted mb-0">Registre os indicadores de segurança do paciente.</p>
+      </div>
+
+      <div class="card border-0" style="border-radius: 12px;">
+        <div class="card-body" style="padding: 18px 18px 10px;">
+          <form method="post" class="row g-3">
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="col-md-6">
+                <label class="form-label fw-semibold text-slate-700">
+                  {{ field.label }}{% if field.field.required %} *{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                  <div class="form-text text-muted">{{ field.help_text }}</div>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="text-danger small">{{ field.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+            <div class="col-12 d-flex gap-2 justify-content-end mt-3">
+              <a href="{% url 'indicadores' %}" class="btn btn-outline-info">Ver indicadores</a>
+              <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-save me-1"></i> Salvar e ir ao dashboard
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function() {
+    const pulseirasInput = document.getElementById("id_total_pulseiras");
+    const pacientesInput = document.getElementById("id_total_pacientes");
+    const taxaInput = document.getElementById("id_taxa_conformidade");
+
+    const toNumber = (el) => {
+      const v = parseFloat((el?.value || "").replace(",", "."));
+      return Number.isFinite(v) ? v : 0;
+    };
+
+    function atualizarTaxa() {
+      const pulseiras = toNumber(pulseirasInput);
+      const pacientes = toNumber(pacientesInput);
+      if (pacientes > 0 && taxaInput) {
+        const taxa = (pulseiras / pacientes) * 100;
+        taxaInput.value = taxa.toFixed(2);
+      }
+    }
+
+    [pulseirasInput, pacientesInput].forEach((el) => {
+      if (el) el.addEventListener("input", atualizarTaxa);
+    });
+
+    if (taxaInput) {
+      taxaInput.readOnly = true;
+    }
+  })();
+</script>
 {% endblock %}

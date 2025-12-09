@@ -21,7 +21,6 @@
     }
     .identity-card:hover {
         animation: identity-expand 0.35s ease forwards;
-        animation-delay: 0.5s;
         box-shadow: 0 16px 30px rgba(0,0,0,0.08);
     }
     @keyframes identity-expand {
@@ -31,7 +30,7 @@
 {% endblock %}
 
 {% block content %}
-<main class="mx-auto max-w-6xl space-y-10 px-0 pb-10">
+<main class="mx-auto max-w-7xl space-y-10 px-4 pb-10">
 
     <section class="relative overflow-hidden rounded-b-3xl bg-gradient-to-br from-sky-600 via-sky-600 to-sky-800 text-white shadow-md">
         <div class="absolute inset-0 opacity-60" style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.12) 0, transparent 40%), radial-gradient(circle at 80% 10%, rgba(255,255,255,0.1) 0, transparent 35%), radial-gradient(circle at 50% 90%, rgba(255,255,255,0.08) 0, transparent 45%);"></div>
@@ -203,13 +202,15 @@
     </section>
 
     <section class="space-y-4">
-        <h2 class="text-lg font-semibold text-slate-900">Módulos integrados (futuro)</h2>
-        <div class="flex flex-wrap gap-2">
-            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">ACOMP – Central de Acompanhantes</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">SESMT – Saúde do Trabalhador</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">CCIH – Controle de Infecção</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">NIR – Regulação Interna</span>
-            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">Engenharia Clínica</span>
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm px-4 py-6" style="min-height: 120px;">
+            <div class="text-xs font-semibold text-slate-500 uppercase mb-2">Integrações futuras</div>
+            <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">📑 ACOMP – Acompanhantes</span>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">🛡️ SESMT – Segurança do Trabalho</span>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">🩺 CCIH – Controle de Infecção</span>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">📊 NIR – Regulação</span>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10">⚡ Engenharia Clínica</span>
+            </div>
         </div>
     </section>
 

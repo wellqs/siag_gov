@@ -2,6 +2,40 @@
 
 {% block title %}{{ titulo }}{% endblock %}
 
+{% block extra_head %}
+<style>
+  .metric-card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    min-height: 170px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .metric-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+  }
+  .metric-label {
+    font-size: 0.95rem;
+    color: #475569;
+    font-weight: 600;
+  }
+  .metric-sub {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+  .metric-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
 
@@ -18,6 +52,7 @@
       </div>
       <div class="col-auto">
         <select id="mesSelect" class="form-select form-select-sm shadow-sm" name="mes">
+          <option value="" {% if not mes_selecionado %}selected{% endif %}>Todos</option>
           {% for num, nome in meses %}
             <option value="{{ num }}" {% if num == mes_selecionado %}selected{% endif %}>{{ nome }}</option>
           {% endfor %}
@@ -41,56 +76,86 @@
 
   <div class="row g-3 mb-4">
     <div class="col-md-4 col-xl-2">
-      <div class="card border-0 shadow-sm h-100">
+      <div class="card metric-card h-100" style="background: #fff6e5; border: 1px solid #f3d3a5;">
         <div class="card-body d-flex flex-column">
-          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos Adversos notificados ao NSP</div>
-          <div class="fs-2 fw-bold text-dark text-center flex-fill d-flex align-items-center justify-content-center" id="val-total-ea-nsp">{{ stats.total_ea_nsp }}</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 col-xl-2">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body d-flex flex-column">
-          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos Adversos enviados ao NOTIVISA</div>
-          <div class="fs-2 fw-bold text-dark text-center flex-fill d-flex align-items-center justify-content-center" id="val-total-ea-notivisa">{{ stats.total_ea_notivisa }}</div>
-          <div class="text-center text-muted" style="font-size: 0.75rem;">
-            <span id="val-ratio">{{ stats.total_ea_notivisa }}</span> / <span id="val-ratio-total">{{ stats.total_ea_nsp }}</span> enviadas
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="metric-label text-dark">Total de EA</div>
+            <div class="metric-icon" style="background:#fbbf24; color:#92400e;">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
           </div>
+          <div class="fs-2 fw-bold text-dark mt-2" id="val-total-ea-nsp">{{ stats.total_ea_nsp }}</div>
+          <div class="metric-sub">Eventos adversos</div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
-      <div class="card border-0 shadow-sm h-100">
+      <div class="card metric-card h-100" style="background: #e6f2ff; border: 1px solid #c7dff8;">
         <div class="card-body d-flex flex-column">
-          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Taxa de conformidade ID</div>
-          <div class="fs-2 fw-bold text-success text-center flex-fill d-flex align-items-center justify-content-center" id="val-taxa-conformidade">{{ stats.taxa_conformidade }}%</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 col-xl-2">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body d-flex flex-column">
-          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Pacientes avaliados</div>
-          <div class="fs-2 fw-bold text-dark text-center flex-fill d-flex align-items-center justify-content-center" id="val-total-pacientes">{{ stats.total_pacientes }}</div>
-          <div class="text-center text-muted" style="font-size: 0.75rem;">
-            <span id="val-pulseiras">{{ stats.total_pulseiras }}</span> com pulseira correta
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="metric-label text-dark">Pulseiras verificadas</div>
+            <div class="metric-icon" style="background:#0ea5e9; color:#0b3b68;">
+              <i class="bi bi-activity"></i>
+            </div>
           </div>
+          <div class="fs-2 fw-bold text-dark mt-2" id="val-total-pulseiras">{{ stats.total_pulseiras }}</div>
+          <div class="metric-sub">Identificação do paciente</div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
-      <div class="card border-0 shadow-sm h-100">
+      <div class="card metric-card h-100" style="background: #fbe7e8; border: 1px solid #f3c3c6;">
         <div class="card-body d-flex flex-column">
-          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos de queda</div>
-          <div class="fs-2 fw-bold text-danger text-center flex-fill d-flex align-items-center justify-content-center" id="val-ea-queda">{{ stats.total_ea_queda }}</div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="metric-label text-dark">Quedas</div>
+            <div class="metric-icon" style="background:#e11d48; color:#fff;">
+              <i class="bi bi-graph-down-arrow"></i>
+            </div>
+          </div>
+          <div class="fs-2 fw-bold text-dark mt-2" id="val-ea-queda">{{ stats.total_ea_queda }}</div>
+          <div class="metric-sub">Total de quedas</div>
         </div>
       </div>
     </div>
     <div class="col-md-4 col-xl-2">
-      <div class="card border-0 shadow-sm h-100">
+      <div class="card metric-card h-100" style="background: #eef2ff; border: 1px solid #d7def8;">
         <div class="card-body d-flex flex-column">
-          <div class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.2;">Eventos por flebite</div>
-          <div class="fs-2 fw-bold text-warning text-center flex-fill d-flex align-items-center justify-content-center" id="val-ea-flebite">{{ stats.total_ea_flebite }}</div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="metric-label text-dark">Pacientes</div>
+            <div class="metric-icon" style="background:#1f2937; color:#e5e7eb;">
+              <i class="bi bi-people-fill"></i>
+            </div>
+          </div>
+          <div class="fs-2 fw-bold text-dark mt-2" id="val-total-pacientes">{{ stats.total_pacientes }}</div>
+          <div class="metric-sub"><span id="val-pulseiras">{{ stats.total_pulseiras }}</span> com pulseira correta</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-xl-2">
+      <div class="card metric-card h-100" style="background: #e8f9f3; border: 1px solid #bceede;">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="metric-label text-dark">Taxa de conformidade</div>
+            <div class="metric-icon" style="background:#10b981; color:#ecfdf3;">
+              <i class="bi bi-check2-circle"></i>
+            </div>
+          </div>
+          <div class="fs-2 fw-bold text-success mt-2" id="val-taxa-conformidade">{{ stats.taxa_conformidade }}%</div>
+          <div class="metric-sub">Protocolos de segurança</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-xl-2">
+      <div class="card metric-card h-100" style="background: #fbf3e8; border: 1px solid #f1d9b8;">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="metric-label text-dark">Flebite</div>
+            <div class="metric-icon" style="background:#f59e0b; color:#7c2d12;">
+              <i class="bi bi-activity"></i>
+            </div>
+          </div>
+          <div class="fs-2 fw-bold text-dark mt-2" id="val-ea-flebite">{{ stats.total_ea_flebite }}</div>
+          <div class="metric-sub">Casos registrados</div>
         </div>
       </div>
     </div>
@@ -144,21 +209,21 @@
     document.addEventListener("DOMContentLoaded", () => {
         const ctxLine = document.getElementById("lineEventos").getContext("2d");
         new Chart(ctxLine, {
-            type: "line",
+            type: "bar",
             data: {
                 labels: chartData.chart_labels,
                 datasets: [
-                    { label: "Eventos Adversos (NSP)", data: chartData.chart_ea_nsp, tension: 0.3, borderColor: "#0d6efd", backgroundColor: "rgba(13, 110, 253, 0.1)", fill: true },
-                    { label: "Eventos Adversos (NOTIVISA)", data: chartData.chart_ea_notivisa, tension: 0.3, borderColor: "#6c757d", borderDash: [5, 5] },
-                    { label: "Quedas", data: chartData.chart_ea_queda, tension: 0.3, borderColor: "#dc3545" },
-                    { label: "Flebite", data: chartData.chart_ea_flebite, tension: 0.3, borderColor: "#ffc107" },
+                    { label: "Eventos Adversos (NSP)", data: chartData.chart_ea_nsp, backgroundColor: "#0d6efd", borderRadius: 6, barThickness: 26, borderSkipped: false },
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { position: "bottom" } },
-                scales: { y: { beginAtZero: true } }
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { stacked: false }
+                }
             }
         });
 
