@@ -34,11 +34,11 @@ class MetricEntryForm(forms.ModelForm):
         }
         labels = {
             "referencia": "Data de referencia",
-            "total_ea_nsp": "Numero de EA ao NSP",
-            "total_ea_notivisa": "Numero de EA NOTIVISA",
+            "total_ea_nsp": "Numero de eventos adversos notificados ao NSP",
+            "total_ea_notivisa": "Numero de eventos adversos enviados ao NOTIVISA",
             "total_pulseiras": "Pacientes com pulseiras padronizadas",
             "total_ea_queda": "Numero de eventos de queda",
-            "total_ea_flebite": "Eventos por flebite",
+            "total_ea_flebite": "Eventos por Flebite",
             "taxa_conformidade": "Taxa de conformidade (%)",
             "total_pacientes": "Total de pacientes avaliados",
         }
